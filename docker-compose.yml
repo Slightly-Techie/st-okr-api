@@ -1,0 +1,16 @@
+services:
+  st_okr_db:
+    image: postgres:latest
+    container_name: st_okr_db
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - st_okr_db_data:/var/lib/postgresql/data
+    ports:
+      - '${DB_PORT}:5432'
+
+volumes:
+  st_okr_db_data:
