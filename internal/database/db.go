@@ -1,9 +1,10 @@
-package db
+package database
 
 import (
 	"fmt"
 	"log"
 
+	"github.com/Slightly-Techie/st-okr-api/api/v1/models"
 	"github.com/Slightly-Techie/st-okr-api/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -33,7 +34,7 @@ func InitDB() error {
 		return err
 	}
 
-	err = DB.AutoMigrate()
+	err = DB.AutoMigrate(&models.User{})
 	if err != nil {
 		log.Fatalf("failed to run database migrations: %s", err)
 		return err
