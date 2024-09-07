@@ -8,17 +8,19 @@ import (
 )
 
 type Config struct {
-	ServerPort   string
-	DBHost       string
-	DBPort       string
-	DBUser       string
-	DBPassword   string
-	DBName       string
-	JWTKey       string
-	SMTPUsername string
-	SMTPPassword string
-	SMTPHost     string
-	SMTPAddress  string
+	ServerPort         string
+	DBHost             string
+	DBPort             string
+	DBUser             string
+	DBPassword         string
+	DBName             string
+	JWTKey             string
+	SMTPUsername       string
+	SMTPPassword       string
+	SMTPHost           string
+	SMTPAddress        string
+	GoogleClientID     string
+	GoogleClientSecret string
 }
 
 var ENV = initConfig()
@@ -31,17 +33,19 @@ func initConfig() Config {
 	}
 
 	return Config{
-		ServerPort:   getEnv("PORT", "8080"),
-		DBPort:       getEnv("DB_PORT", "5432"),
-		DBHost:       getEnv("DB_HOST", "localhost"),
-		DBUser:       getEnv("DB_USER", "postgres"),
-		DBPassword:   getEnv("DB_PASSWORD", "mypassword"),
-		DBName:       getEnv("DB_NAME", "my_db_name"),
-		JWTKey:       getEnv("JWT_KEY", "someJWTKey"),
-		SMTPUsername: getEnv("SMTP_USERNAME", "someEmail"),
-		SMTPPassword: getEnv("SMTP_PASSWORD", "somePassword"),
-		SMTPHost:     getEnv("SMTP_HOST", "smtp.emailprovider.com"),
-		SMTPAddress:  getEnv("SMTP_ADDR", "smtp.gmail.com:587"),
+		ServerPort:         getEnv("PORT", "8080"),
+		DBPort:             getEnv("DB_PORT", "5432"),
+		DBHost:             getEnv("DB_HOST", "localhost"),
+		DBUser:             getEnv("DB_USER", "postgres"),
+		DBPassword:         getEnv("DB_PASSWORD", "mypassword"),
+		DBName:             getEnv("DB_NAME", "my_db_name"),
+		JWTKey:             getEnv("JWT_KEY", "someJWTKey"),
+		SMTPUsername:       getEnv("SMTP_USERNAME", "someEmail"),
+		SMTPPassword:       getEnv("SMTP_PASSWORD", "somePassword"),
+		SMTPHost:           getEnv("SMTP_HOST", "smtp.emailprovider.com"),
+		SMTPAddress:        getEnv("SMTP_ADDR", "smtp.gmail.com:587"),
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", "some-client-id"),
+		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", "some-client-secret"),
 	}
 }
 
