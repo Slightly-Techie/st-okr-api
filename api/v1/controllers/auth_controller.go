@@ -37,7 +37,6 @@ func (ctrl *AuthController) GetOAuthCallback(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"user": user})
-	c.Redirect(http.StatusFound, "http://localhost:5174")
 }
 
 func (ctrl *AuthController) LogoutWithOAuth(c *gin.Context) {
