@@ -15,6 +15,7 @@ var (
 	DB *gorm.DB
 )
 
+
 func InitDB() error {
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", config.ENV.DBUser, config.ENV.DBPassword, config.ENV.DBHost, config.ENV.DBPort, config.ENV.DBName)
 

@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/Slightly-Techie/st-okr-api/api/v1/services"
+	"github.com/gin-gonic/gin"
 )
 
 type AuthController struct {
@@ -30,13 +30,12 @@ func (ctrl *AuthController) ContinueWithOAuth(c *gin.Context) {
 func (ctrl *AuthController) GetOAuthCallback(c *gin.Context) {
 	provider := c.Param("provider")
 
-	user, err := ctrl.authService.GetAuthCallback(provider, c)
+	authRes, err := ctrl.authService.GetAuthCallback(provider, c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.JSON(200, gin.H{"user": user})
+	c.JSON(200, gin.H{"user": authRes})
 }
 
 func (ctrl *AuthController) LogoutWithOAuth(c *gin.Context) {

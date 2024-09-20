@@ -15,7 +15,7 @@ func AuthRoutes(r *gin.RouterGroup, validator *validator.Validate) {
 	authController := controllers.NewAuthController(authService)
 	authRoutes := r.Group("/auth")
 
-	authRoutes.GET("/:provider", authController.ContinueWithOAuth)
-	authRoutes.GET("/:provider/callback", authController.GetOAuthCallback)
-	authRoutes.GET("/logout/:provider", authController.LogoutWithOAuth)
+	authRoutes.GET("/:provider", authController.ContinueWithOAuth)         //localhost:8080/api/v1/google
+	authRoutes.GET("/:provider/callback", authController.GetOAuthCallback) //localhost:8080/api/v1/google/callback
+	authRoutes.GET("/logout/:provider", authController.LogoutWithOAuth)    //localhost:8080/api/v1/logout/google
 }

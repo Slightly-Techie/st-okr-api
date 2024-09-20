@@ -13,7 +13,7 @@ import (
 
 type AuthService interface {
 	AuthHandler(provider string, c *gin.Context)
-	GetAuthCallback(provider string, c *gin.Context) (interface{}, error)
+	GetAuthCallback(provider string, c *gin.Context) (*dto.AuthResponse, error)
 	Logout(provider string, c *gin.Context) error
 }
 
@@ -37,7 +37,7 @@ func (s *authService) AuthHandler(provider string, c *gin.Context) {
 	gothic.BeginAuthHandler(c.Writer, c.Request)
 }
 
-func (s *authService) GetAuthCallback(provider string, c *gin.Context) (interface{}, error) {
+func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.AuthResponse, error) {
 	q := c.Request.URL.Query()
 	q.Add("provider", provider)
 	c.Request.URL.RawQuery = q.Encode()
@@ -46,6 +46,8 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (interfac
 	if err != nil {
 		return nil, err
 	}
+
+	
 
 	existingUser, err := s.repo.GetByIdentifier("provider_id", user.UserID)
 

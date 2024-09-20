@@ -39,7 +39,7 @@ func initConfig() Config {
 		DBUser:             getEnv("DB_USER", "postgres"),
 		DBPassword:         getEnv("DB_PASSWORD", "mypassword"),
 		DBName:             getEnv("DB_NAME", "my_db_name"),
-		JWTKey:             getEnv("JWT_KEY", "someJWTKey"),
+		JWTKey:             getEnv("BACKEND_JWT_KEY", "someJWTKey"),
 		SMTPUsername:       getEnv("SMTP_USERNAME", "someEmail"),
 		SMTPPassword:       getEnv("SMTP_PASSWORD", "somePassword"),
 		SMTPHost:           getEnv("SMTP_HOST", "smtp.emailprovider.com"),
