@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/Slightly-Techie/st-okr-api/api/v1/models"
@@ -69,6 +70,9 @@ func (r *companyRepository) Delete(id string) error {
 		log.Println("error deleting company: ", res.Error)
 		return res.Error
 	}
-
+	if res.RowsAffected == 0 {
+		log.Println("no company found with the given id")
+		return fmt.Errorf("no company found with id: %s", id)
+	}
 	return nil
 }

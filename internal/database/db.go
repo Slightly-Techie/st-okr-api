@@ -15,7 +15,6 @@ var (
 	DB *gorm.DB
 )
 
-
 func InitDB() error {
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", config.ENV.DBUser, config.ENV.DBPassword, config.ENV.DBHost, config.ENV.DBPort, config.ENV.DBName)
 
@@ -35,7 +34,7 @@ func InitDB() error {
 		return err
 	}
 
-	err = DB.AutoMigrate(&models.User{})
+	err = DB.AutoMigrate(&models.User{}, &models.Company{})
 	if err != nil {
 		log.Fatalf("failed to run database migrations: %s", err)
 		return err

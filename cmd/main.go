@@ -12,7 +12,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-
 func main() {
 	database.InitDB()
 	validator := validator.New()
@@ -29,6 +28,7 @@ func main() {
 	v1 := engine.Group("/api/v1")
 
 	routes.AuthRoutes(v1, validator)
+	routes.CompanyRoutes(v1, validator)
 
 	if err := engine.Run(":" + config.ENV.ServerPort); err != nil {
 		log.Panicf("error: %s", err)
