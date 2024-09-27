@@ -10,9 +10,9 @@ import (
 func NewAuth() {
 	googleClientID := config.ENV.GoogleClientID
 	googleClientSecret := config.ENV.GoogleClientSecret
-	callbackURL := fmt.Sprintf("http://localhost:%s/api/v1/auth/google/callback", config.ENV.ServerPort)
+	googleCallbackURL := fmt.Sprintf("http://localhost:%s/api/v1/auth/google/callback", config.ENV.ServerPort)
 
 	goth.UseProviders(
-		google.New(googleClientID, googleClientSecret, callbackURL, "email", "profile"),
+		google.New(googleClientID, googleClientSecret, googleCallbackURL, "email", "profile"),
 	)
 }

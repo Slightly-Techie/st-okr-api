@@ -1,4 +1,12 @@
-# API Setup Guide
+# OKR Project
+
+Welcome to the OKR (Objectives and Key Results) project! We're excited to have you here.
+
+## What are OKRs?
+
+OKRs are a goal-setting framework used to define objectives and the key results that indicate success. They help teams align their efforts and focus on achieving specific, measurable outcomes.
+
+## API Setup Guide
 Follow the steps below to set up the API locally:
 
 ### Prerequisites
