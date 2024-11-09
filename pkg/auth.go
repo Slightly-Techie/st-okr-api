@@ -2,7 +2,8 @@ package auth
 
 import (
 	"fmt"
-	"github.com/Slightly-Techie/st-okr-api/internal/config"
+
+	"github.com/Slightly-Techie/st-okr-api/config"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
 )

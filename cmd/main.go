@@ -2,37 +2,29 @@ package main
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/Slightly-Techie/st-okr-api/api/v1/routes"
-	"github.com/Slightly-Techie/st-okr-api/internal/auth"
-	"github.com/Slightly-Techie/st-okr-api/internal/config"
-	"github.com/Slightly-Techie/st-okr-api/internal/database"
-	"github.com/gin-contrib/cors"
+	"github.com/Slightly-Techie/st-okr-api/db"
+	"github.com/Slightly-Techie/st-okr-api/internal/routes"
+	"github.com/Slightly-Techie/st-okr-api/provider"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 func main() {
-	database.InitDB()
-	validator := validator.New()
-
-	auth.NewAuth()
-	engine := gin.Default()
-
-	engine.Use(cors.Default())
-
-	engine.GET("/", func(c *gin.Context) {
-		c.String(200, "pong")
-	})
-
-	v1 := engine.Group("/api/v1")
-
-	routes.AuthRoutes(v1, validator)
-	routes.CompanyRoutes(v1, validator)
-
-	if err := engine.Run(":" + config.ENV.ServerPort); err != nil {
-		log.Panicf("error: %s", err)
+	database, err := db.InitDB()
+	if err != nil {
+		log.Fatalf("could not connect to db: %v", err)
 	}
 
-	log.Printf("server running on port: %s", config.ENV.ServerPort)
+	validator := validator.New()
+
+	provider := provider.NewProvider(database, validator)
+
+	router := routes.SetupRouter(provider)
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Hello to the SlightlyTechie OKR API!"})
+	})
+
+	router.Run(":8080")
 }

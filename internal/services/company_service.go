@@ -1,10 +1,10 @@
 package services
 
 import (
-	"github.com/Slightly-Techie/st-okr-api/api/v1/dto"
-	"github.com/Slightly-Techie/st-okr-api/api/v1/models"
-	"github.com/Slightly-Techie/st-okr-api/api/v1/repositories"
-	"github.com/Slightly-Techie/st-okr-api/internal/helper"
+	"github.com/Slightly-Techie/st-okr-api/helper"
+	"github.com/Slightly-Techie/st-okr-api/internal/dto"
+	"github.com/Slightly-Techie/st-okr-api/internal/models"
+	"github.com/Slightly-Techie/st-okr-api/internal/repositories"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
@@ -48,10 +48,6 @@ func (c *companyService) CreateCompany(r dto.CreateCompanyRequest) (*models.Comp
 }
 
 func (c *companyService) GetCompany(ident, id string) (*models.Company, error) {
-	// err := c.validator.Struct(r)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	data, err := c.repo.GetByIdentifier(ident, id)
 	if err != nil {
 		return nil, err
@@ -67,7 +63,6 @@ func (c *companyService) UpdateCompany(r dto.CreateCompanyRequest) (*models.Comp
 	company := models.Company{
 		ID:        r.ID,
 		Name:      r.Name,
-		Code:      r.Code,
 		CreatorID: r.CreatorId,
 	}
 	resp, err := c.repo.Update(&company)
@@ -78,10 +73,6 @@ func (c *companyService) UpdateCompany(r dto.CreateCompanyRequest) (*models.Comp
 }
 
 func (c *companyService) DeleteCompany(id string) error {
-	// err := c.validator.Struct(r)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	err := c.repo.Delete(id)
 	if err != nil {
 		return err
