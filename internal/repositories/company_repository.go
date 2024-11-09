@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Slightly-Techie/st-okr-api/api/v1/models"
+	"github.com/Slightly-Techie/st-okr-api/internal/models"
 	"gorm.io/gorm"
 )
 

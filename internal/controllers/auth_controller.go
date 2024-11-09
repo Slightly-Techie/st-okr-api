@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Slightly-Techie/st-okr-api/api/v1/services"
+	"github.com/Slightly-Techie/st-okr-api/internal/services"
 	"github.com/gin-gonic/gin"
 )
 

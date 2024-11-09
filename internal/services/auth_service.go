@@ -1,10 +1,10 @@
 package services
 
 import (
-	"github.com/Slightly-Techie/st-okr-api/api/v1/dto"
-	"github.com/Slightly-Techie/st-okr-api/api/v1/models"
-	"github.com/Slightly-Techie/st-okr-api/api/v1/repositories"
-	"github.com/Slightly-Techie/st-okr-api/internal/auth"
+	"github.com/Slightly-Techie/st-okr-api/internal/dto"
+	"github.com/Slightly-Techie/st-okr-api/internal/models"
+	"github.com/Slightly-Techie/st-okr-api/internal/repositories"
+	auth "github.com/Slightly-Techie/st-okr-api/pkg"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -47,9 +47,10 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 		return nil, err
 	}
 
-	
-
 	existingUser, err := s.repo.GetByIdentifier("provider_id", user.UserID)
+	if err != nil {
+		return nil, err
+	}
 
 	if existingUser == nil {
 		data := models.User{

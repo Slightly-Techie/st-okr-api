@@ -3,7 +3,7 @@ package auth
 import (
 	"time"
 
-	"github.com/Slightly-Techie/st-okr-api/internal/config"
+	"github.com/Slightly-Techie/st-okr-api/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
