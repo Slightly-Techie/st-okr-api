@@ -29,7 +29,7 @@ func InitDB() (*gorm.DB, error) {
 	}
 
 	// Run DB Migrations
-	err = db.AutoMigrate(&models.User{}, &models.Company{})
+	err = db.AutoMigrate(&models.User{}, &models.Company{}, &models.Membership{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to run migrations: %w", err)
 	}

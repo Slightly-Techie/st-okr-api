@@ -6,6 +6,7 @@ import (
 
 	"github.com/Slightly-Techie/st-okr-api/db"
 	"github.com/Slightly-Techie/st-okr-api/internal/routes"
+	auth "github.com/Slightly-Techie/st-okr-api/pkg"
 	"github.com/Slightly-Techie/st-okr-api/provider"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -18,6 +19,7 @@ func main() {
 	}
 
 	validator := validator.New()
+	auth.NewAuth()
 
 	provider := provider.NewProvider(database, validator)
 

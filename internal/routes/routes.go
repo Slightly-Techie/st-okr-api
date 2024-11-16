@@ -15,7 +15,7 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -36,13 +36,28 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 	}
 
 	// Company routes
-	companyRoutes := v1.Group("/company")
+	companyRoutes := v1.Group("/companies")
 	companyRoutes.Use(middleware.RequireAuth(prov))
 	{
 		companyRoutes.POST("/", prov.CompanyController.CreateCompany)
 		companyRoutes.GET("/:id", prov.CompanyController.GetCompany)
 		companyRoutes.PUT("/:id", prov.CompanyController.UpdateCompany)
 		companyRoutes.DELETE("/:id", prov.CompanyController.DeleteCompany)
+	}
+
+	// Membership routes
+	membershipRoutes := v1.Group("/memberships")
+	membershipRoutes.Use(middleware.RequireAuth(prov))
+	{
+		membershipRoutes.POST("/", prov.MembershipController.CreateMembership)
+		membershipRoutes.GET("/:id", prov.MembershipController.GetMembership)
+		membershipRoutes.PUT("/:id", prov.MembershipController.UpdateMembership)
+		membershipRoutes.DELETE("/:id", prov.MembershipController.DeleteMembership)
+		
+		// Additional membership routes
+		membershipRoutes.GET("/company/:company_id", prov.MembershipController.GetCompanyMembers)
+		membershipRoutes.PATCH("/:id/role", prov.MembershipController.UpdateMembershipRole)
+		membershipRoutes.PATCH("/:id/status", prov.MembershipController.UpdateMembershipStatus)
 	}
 
 	return router
