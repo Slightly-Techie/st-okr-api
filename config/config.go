@@ -19,8 +19,13 @@ type Config struct {
 	SMTPPassword       string
 	SMTPHost           string
 	SMTPAddress        string
+	SMTPPort           string
 	GoogleClientID     string
 	GoogleClientSecret string
+	RabbitUser         string
+	RabbitPassword     string
+	RabbitHost         string
+	RabbitPort         string
 }
 
 var ENV = initConfig()
@@ -44,8 +49,13 @@ func initConfig() Config {
 		SMTPPassword:       getEnv("SMTP_PASSWORD", "somePassword"),
 		SMTPHost:           getEnv("SMTP_HOST", "smtp.emailprovider.com"),
 		SMTPAddress:        getEnv("SMTP_ADDR", "smtp.gmail.com:587"),
+		SMTPPort:           getEnv("SMTP_PORT", "587"),
 		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", "some-client-id"),
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", "some-client-secret"),
+		RabbitUser:         getEnv("RABBIT_USER", "guest"),
+		RabbitPassword:     getEnv("RABBIT_PASSWORD", "guest"),
+		RabbitHost: 	   getEnv("RABBIT_HOST", "localhost"),
+		RabbitPort:         getEnv("RABBIT_PORT", "5672"),
 	}
 }
 
