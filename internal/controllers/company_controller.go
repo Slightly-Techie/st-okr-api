@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
@@ -20,22 +20,37 @@ func NewCompanyController(companyService services.CompanyService) *CompanyContro
 }
 
 func (ctrl *CompanyController) CreateCompany(c *gin.Context) {
-	var body dto.CreateCompanyRequest
+	type CCBody struct {
+		Name string `json:"name"`
+	}
+	var body CCBody
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized request"})
+		return
+	}
 
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	data, err := ctrl.companyService.CreateCompany(body)
+	reqBody := dto.CreateCompanyRequest{
+		Name:      body.Name,
+		CreatorId: userID.(string),
+	}
+
+	fmt.Println(reqBody)
+
+	data, err := ctrl.companyService.CreateCompany(reqBody)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	resp, _ := json.Marshal(data)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Company created successfully",
-		"data":    string(resp),
+		"data":    data,
 	})
 }
 
@@ -50,10 +65,9 @@ func (ctrl *CompanyController) GetCompany(c *gin.Context) {
 		return
 	}
 
-	resp, _ := json.Marshal(data)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Company found",
-		"data":    string(resp),
+		"data":    data,
 	})
 }
 
@@ -70,10 +84,9 @@ func (ctrl *CompanyController) UpdateCompany(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	resp, _ := json.Marshal(data)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Company created successfully",
-		"data":    string(resp),
+		"data":    data,
 	})
 }
 

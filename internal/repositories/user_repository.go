@@ -9,6 +9,7 @@ import (
 )
 
 type UserRepository interface {
+	GetDB() *gorm.DB
 	GetByIdentifier(identifier, id string) (*models.User, error)
 	Create(user *models.User) (*models.User, error)
 	Update(user *models.User) (*models.User, error)
@@ -23,6 +24,11 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{
 		db: db,
 	}
+}
+
+// GetDB returns the database instance
+func (r *userRepository) GetDB() *gorm.DB {
+	return r.db
 }
 
 func (r *userRepository) GetByIdentifier(identifier, id string) (*models.User, error) {

@@ -1,12 +1,15 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/Slightly-Techie/st-okr-api/helper"
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
 	"github.com/Slightly-Techie/st-okr-api/internal/models"
 	"github.com/Slightly-Techie/st-okr-api/internal/repositories"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type CompanyService interface {
@@ -29,53 +32,77 @@ func NewCompanyService(repo repositories.CompanyRepository, validator *validator
 }
 
 func (c *companyService) CreateCompany(r dto.CreateCompanyRequest) (*models.Company, error) {
-	err := c.validator.Struct(r)
+	if err := c.validator.Struct(r); err != nil {
+		return nil, err
+	}
+
+	var company models.Company
+
+	err := c.repo.GetDB().Transaction(func(tx *gorm.DB) error {
+		// Create company
+		company = models.Company{
+			ID:        uuid.NewString(),
+			Name:      r.Name,
+			Code:      helper.GenerateCompanyCode(r.Name, r.CreatorId),
+			CreatorID: r.CreatorId,
+		}
+
+		if err := tx.Create(&company).Error; err != nil {
+			return fmt.Errorf("failed to create company: %w", err)
+		}
+
+		// Create membership for the creator
+		membership := models.Membership{
+			ID:        uuid.NewString(),
+			UserID:    r.CreatorId,
+			CompanyID: company.ID,
+			Role:      models.RoleAdmin, // Creator gets admin role
+			Status:    models.StatusActive,
+		}
+
+		if err := tx.Create(&membership).Error; err != nil {
+			return fmt.Errorf("failed to create membership: %w", err)
+		}
+
+		return nil
+	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("transaction failed: %w", err)
 	}
-	company := models.Company{
-		ID:        uuid.NewString(),
-		Name:      r.Name,
-		Code:      helper.GenerateCompanyCode(r.Name, r.CreatorId),
-		CreatorID: r.CreatorId,
-	}
-	resp, err := c.repo.Create(&company)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+
+	return &company, nil
 }
 
 func (c *companyService) GetCompany(ident, id string) (*models.Company, error) {
-	data, err := c.repo.GetByIdentifier(ident, id)
+	company, err := c.repo.GetByIdentifier(ident, id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get company: %w", err)
 	}
-	return data, nil
+	return company, nil
 }
 
 func (c *companyService) UpdateCompany(r dto.CreateCompanyRequest) (*models.Company, error) {
-	err := c.validator.Struct(r)
-	if err != nil {
+	if err := c.validator.Struct(r); err != nil {
 		return nil, err
 	}
+
 	company := models.Company{
-		ID:        r.ID,
 		Name:      r.Name,
 		CreatorID: r.CreatorId,
 	}
-	resp, err := c.repo.Update(&company)
+
+	updatedCompany, err := c.repo.Update(&company)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update company: %w", err)
 	}
-	return resp, nil
+
+	return updatedCompany, nil
 }
 
 func (c *companyService) DeleteCompany(id string) error {
-	err := c.repo.Delete(id)
-	if err != nil {
-		return err
+	if err := c.repo.Delete(id); err != nil {
+		return fmt.Errorf("failed to delete company: %w", err)
 	}
 	return nil
 }

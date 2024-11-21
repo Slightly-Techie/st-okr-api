@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
@@ -12,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/markbates/goth/gothic"
+	"gorm.io/gorm"
 )
 
 type AuthService interface {
@@ -41,20 +43,41 @@ func (s *authService) AuthHandler(provider string, c *gin.Context) {
 }
 
 func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.AuthResponse, error) {
+	// Add provider to query parameters
 	q := c.Request.URL.Query()
 	q.Add("provider", provider)
 	c.Request.URL.RawQuery = q.Encode()
 
-	user, err := gothic.CompleteUserAuth(c.Writer, c.Request)
+	// Get user data from OAuth provider
+	gothUser, err := gothic.CompleteUserAuth(c.Writer, c.Request)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to complete user auth: %w", err)
 	}
 
-	existingUser, err := s.repo.GetByIdentifier("provider_id", user.UserID)
-	if err != nil {
-		return nil, err
-	}
+	// Look for existing user
+	var existingUser models.User
+	result := s.repo.GetDB().Where("provider_id = ?", gothUser.UserID).First(&existingUser)
 
+	// If user doesn't exist, create new user
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			newUser := models.User{
+				ID:         uuid.NewString(),
+				FirstName:  gothUser.FirstName,
+				LastName:   gothUser.LastName,
+				AvatarURL:  gothUser.AvatarURL,
+				UserName:   gothUser.NickName,
+				ProviderID: gothUser.UserID,
+				Email:      gothUser.Email,
+			}
+
+			if err := s.repo.GetDB().Create(&newUser).Error; err != nil {
+				return nil, fmt.Errorf("failed to create user: %w", err)
+			}
+
+			existingUser = newUser
+		} else {
+			return nil, fmt.Errorf("database error: %w", result.Error)
 	fmt.Println(existingUser)
 
 	if existingUser == nil {
@@ -67,20 +90,16 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 			ProviderID: user.UserID,
 			Email:      user.Email,
 		}
-
-		usr, err := s.repo.Create(&data)
-		if err != nil {
-			return nil, err
-		}
-
-		existingUser = usr
 	}
 
-	access_token, refresh_token, expiry, err := auth.CreateJWTTokens(existingUser.ID)
+	// Generate JWT tokens
+	accessToken, refreshToken, expiry, err := auth.CreateJWTTokens(existingUser.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create JWT tokens: %w", err)
 	}
 
+	// Create response
+	response := &dto.AuthResponse{
 	message.PublishMessage("sign_up", map[string]interface{}{
 		"user_name": existingUser.UserName,
 		"email":     existingUser.Email,
@@ -92,11 +111,12 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 		UserName:     existingUser.UserName,
 		Email:        existingUser.Email,
 		ID:           existingUser.ID,
-		AccessToken:  access_token,
-		RefreshToken: refresh_token,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 		ExpiresIn:    expiry,
 	}
-	return res, nil
+
+	return response, nil
 }
 
 func (s *authService) Logout(provider string, c *gin.Context) error {
