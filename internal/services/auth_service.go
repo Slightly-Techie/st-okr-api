@@ -58,9 +58,9 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 	var existingUser models.User
 	result := s.repo.GetDB().Where("provider_id = ?", gothUser.UserID).First(&existingUser)
 
-	// If user doesn't exist, create new user
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			// If user doesn't exist, create new user
 			newUser := models.User{
 				ID:         uuid.NewString(),
 				FirstName:  gothUser.FirstName,
@@ -78,17 +78,6 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 			existingUser = newUser
 		} else {
 			return nil, fmt.Errorf("database error: %w", result.Error)
-	fmt.Println(existingUser)
-
-	if existingUser == nil {
-		data := models.User{
-			ID:         uuid.NewString(),
-			FirstName:  user.FirstName,
-			LastName:   user.LastName,
-			AvatarURL:  user.AvatarURL,
-			UserName:   user.NickName,
-			ProviderID: user.UserID,
-			Email:      user.Email,
 		}
 	}
 
@@ -98,14 +87,14 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 		return nil, fmt.Errorf("failed to create JWT tokens: %w", err)
 	}
 
-	// Create response
-	response := &dto.AuthResponse{
+	// Publish sign-up message
 	message.PublishMessage("sign_up", map[string]interface{}{
 		"user_name": existingUser.UserName,
 		"email":     existingUser.Email,
 	})
 
-	res := &dto.AuthResponse{
+	// Create response
+	response := &dto.AuthResponse{
 		FirstName:    existingUser.FirstName,
 		LastName:     existingUser.LastName,
 		UserName:     existingUser.UserName,
