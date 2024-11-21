@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
+	"github.com/Slightly-Techie/st-okr-api/internal/message"
 	"github.com/Slightly-Techie/st-okr-api/internal/models"
 	"github.com/Slightly-Techie/st-okr-api/internal/repositories"
 	auth "github.com/Slightly-Techie/st-okr-api/pkg"
@@ -77,6 +78,17 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 			existingUser = newUser
 		} else {
 			return nil, fmt.Errorf("database error: %w", result.Error)
+	fmt.Println(existingUser)
+
+	if existingUser == nil {
+		data := models.User{
+			ID:         uuid.NewString(),
+			FirstName:  user.FirstName,
+			LastName:   user.LastName,
+			AvatarURL:  user.AvatarURL,
+			UserName:   user.NickName,
+			ProviderID: user.UserID,
+			Email:      user.Email,
 		}
 	}
 
@@ -88,6 +100,12 @@ func (s *authService) GetAuthCallback(provider string, c *gin.Context) (*dto.Aut
 
 	// Create response
 	response := &dto.AuthResponse{
+	message.PublishMessage("sign_up", map[string]interface{}{
+		"user_name": existingUser.UserName,
+		"email":     existingUser.Email,
+	})
+
+	res := &dto.AuthResponse{
 		FirstName:    existingUser.FirstName,
 		LastName:     existingUser.LastName,
 		UserName:     existingUser.UserName,
