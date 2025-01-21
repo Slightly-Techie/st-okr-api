@@ -25,7 +25,7 @@ type TeamRepository interface {
 	AddTeamMember(member *models.TeamMember) (*models.TeamMember, error)
 	RemoveTeamMember(teamID, userID string) error
 	GetTeamMembers(id string) ([]models.TeamMember, error)
-	// IsMember(teamID, userID string) (bool, error)
+	IsMember(teamID, userID string) (bool, error)
 }
 
 type teamRepository struct {
@@ -50,7 +50,7 @@ func (r *teamRepository) GetByIdentifier(identifier, id string) (*models.Team, e
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrTeamNotFound
 		}
-		log.Printf("error getting membership by identifier: %v", res.Error)
+		log.Printf("error getting team by identifier: %v", res.Error)
 		return nil, fmt.Errorf("%w: %v", ErrTeamDBOperation, res.Error)
 	}
 	return &team, nil
@@ -121,4 +121,18 @@ func (r *teamRepository) RemoveTeamMember(teamID, userID string) error {
 		return ErrTeamMemberNotFound
 	}
 	return nil
+}
+
+func (r *teamRepository) IsMember(teamID, userID string) (bool, error) {
+	var member models.TeamMember
+
+	res := r.db.Where("team_id = ? AND user_id = ?", teamID, userID).First(&member)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		log.Printf("error checking team membership: %v", res.Error)
+		return false, fmt.Errorf("failed to check team membership: %v", res.Error)
+	}
+	return true, nil
 }
