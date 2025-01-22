@@ -23,7 +23,7 @@ type TeamRepository interface {
 	DeleteTeam(id string) error
 
 	AddTeamMember(member *models.TeamMember) (*models.TeamMember, error)
-	RemoveTeamMember(teamID, userID string) error
+	RemoveTeamMember(id string) error
 	GetTeamMembers(id string) ([]models.TeamMember, error)
 	IsMember(teamID, userID string) (bool, error)
 }
@@ -110,14 +110,14 @@ func (r *teamRepository) GetTeamMembers(id string) ([]models.TeamMember, error) 
 	return members, nil
 }
 
-func (r *teamRepository) RemoveTeamMember(teamID, userID string) error {
-	res := r.db.Where("teamID = ? and userID = ?", teamID, userID).Delete(&models.TeamMember{})
+func (r *teamRepository) RemoveTeamMember(id string) error {
+	res := r.db.Where("id = ?", id).Delete(&models.TeamMember{})
 	if res.Error != nil {
 		log.Printf("error removing team member: %v", res.Error)
 		return fmt.Errorf("%w: %v", ErrTeamDBOperation, res.Error)
 	}
 	if res.RowsAffected == 0 {
-		log.Printf("no team member found with id: %s in team: %s", userID, teamID)
+		log.Printf("no team member found with id: %s", id)
 		return ErrTeamMemberNotFound
 	}
 	return nil
