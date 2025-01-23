@@ -97,6 +97,10 @@ func (tctrl *TeamController) AddTeamMember(c *gin.Context) {
 
 	member, err := tctrl.teamService.AddMember(&addMemberDTO)
 	if err != nil {
+		if err.Error() == "user is already a member of the team" {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
