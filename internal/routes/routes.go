@@ -53,11 +53,21 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 		membershipRoutes.GET("/:id", prov.MembershipController.GetMembership)
 		membershipRoutes.PUT("/:id", prov.MembershipController.UpdateMembership)
 		membershipRoutes.DELETE("/:id", prov.MembershipController.DeleteMembership)
-		
+
 		// Additional membership routes
 		membershipRoutes.GET("/company/:company_id", prov.MembershipController.GetCompanyMembers)
 		membershipRoutes.PATCH("/:id/role", prov.MembershipController.UpdateMembershipRole)
 		membershipRoutes.PATCH("/:id/status", prov.MembershipController.UpdateMembershipStatus)
+	}
+
+	//objective routes
+	objectiveRoutes := v1.Group("/objectives")
+	objectiveRoutes.Use(middleware.RequireAuth(prov))
+	{
+		objectiveRoutes.POST("/")
+		objectiveRoutes.GET("/:id")
+		objectiveRoutes.PUT("/:id")
+		objectiveRoutes.DELETE("/id")
 	}
 
 	return router
