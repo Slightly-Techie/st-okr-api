@@ -12,6 +12,7 @@ type Provider struct {
 	UserController       *controllers.AuthController
 	CompanyController    *controllers.CompanyController
 	MembershipController *controllers.MembershipController
+	ObjectivesController *controllers.ObjectivesController
 	DB                   *gorm.DB
 }
 
@@ -20,21 +21,25 @@ func NewProvider(db *gorm.DB, validator *validator.Validate) *Provider {
 	userRepo := repositories.NewUserRepository(db)
 	companyRepo := repositories.NewCompanyRepository(db)
 	membershipRepo := repositories.NewMembershipRepository(db)
+	objectiveRepo := repositories.NewObjectivesRepository(db)
 
 	// Initialize services
 	userService := services.NewAuthService(userRepo, validator)
 	companyService := services.NewCompanyService(companyRepo, validator)
 	membershipService := services.NewMembershipService(membershipRepo, validator)
+	objectivesService := services.NewObjectivesService(objectiveRepo, validator)
 
 	// Initialize controllers
 	userController := controllers.NewAuthController(userService)
 	companyController := controllers.NewCompanyController(companyService)
 	membershipController := controllers.NewMembershipController(membershipService)
+	objectivesController := controllers.NewObjectiveController(objectivesService)
 
 	return &Provider{
 		UserController:       userController,
 		CompanyController:    companyController,
 		MembershipController: membershipController,
+		ObjectivesController: objectivesController,
 		DB:                   db,
 	}
 }

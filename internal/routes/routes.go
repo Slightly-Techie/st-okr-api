@@ -64,10 +64,10 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 	objectiveRoutes := v1.Group("/objectives")
 	objectiveRoutes.Use(middleware.RequireAuth(prov))
 	{
-		objectiveRoutes.POST("/")
-		objectiveRoutes.GET("/:id")
-		objectiveRoutes.PUT("/:id")
-		objectiveRoutes.DELETE("/id")
+		objectiveRoutes.POST("/", prov.ObjectivesController.CreateObjective)
+		objectiveRoutes.GET("/:id", prov.ObjectivesController.GetObjectives)
+		objectiveRoutes.PUT("/:id", prov.ObjectivesController.UpdateObjective)
+		objectiveRoutes.DELETE("/id", prov.ObjectivesController.DeleteObjective)
 	}
 
 	return router
