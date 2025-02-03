@@ -54,7 +54,7 @@ func initConfig() Config {
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", "some-client-secret"),
 		RabbitUser:         getEnv("RABBIT_USER", "guest"),
 		RabbitPassword:     getEnv("RABBIT_PASSWORD", "guest"),
-		RabbitHost: 	   getEnv("RABBIT_HOST", "localhost"),
+		RabbitHost:         getEnv("RABBIT_HOST", "localhost"),
 		RabbitPort:         getEnv("RABBIT_PORT", "5672"),
 	}
 }
