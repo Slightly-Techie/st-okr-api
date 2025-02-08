@@ -70,7 +70,7 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 		teamRoutes.DELETE("/:id", prov.TeamController.DeleteTeam)
 
 		// Team Membership
-		teamRoutes.POST("/members", prov.TeamController.AddTeamMember)
+		teamRoutes.POST("/:id/members", prov.TeamController.AddTeamMember)
 		teamRoutes.GET("/:id/members", prov.TeamController.ListTeamMembers)
 		teamRoutes.DELETE("/members/:id", prov.TeamController.RemoveMember)
 	}
