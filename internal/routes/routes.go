@@ -53,11 +53,26 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 		membershipRoutes.GET("/:id", prov.MembershipController.GetMembership)
 		membershipRoutes.PUT("/:id", prov.MembershipController.UpdateMembership)
 		membershipRoutes.DELETE("/:id", prov.MembershipController.DeleteMembership)
-		
+
 		// Additional membership routes
 		membershipRoutes.GET("/company/:company_id", prov.MembershipController.GetCompanyMembers)
 		membershipRoutes.PATCH("/:id/role", prov.MembershipController.UpdateMembershipRole)
 		membershipRoutes.PATCH("/:id/status", prov.MembershipController.UpdateMembershipStatus)
+	}
+
+	// team routes
+	teamRoutes := v1.Group("/teams")
+	teamRoutes.Use(middleware.RequireAuth(prov))
+	{
+		teamRoutes.GET("/:id", prov.TeamController.GetTeam)
+		teamRoutes.POST("/", prov.TeamController.CreateTeam)
+		teamRoutes.PUT("/:id", prov.TeamController.UpdateTeam)
+		teamRoutes.DELETE("/:id", prov.TeamController.DeleteTeam)
+
+		// Team Membership
+		teamRoutes.POST("/members", prov.TeamController.AddTeamMember)
+		teamRoutes.GET("/:id/members", prov.TeamController.ListTeamMembers)
+		teamRoutes.DELETE("/members/:id", prov.TeamController.RemoveMember)
 	}
 
 	return router
