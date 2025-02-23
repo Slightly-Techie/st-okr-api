@@ -112,9 +112,9 @@ func (tctrl *TeamController) AddTeamMember(c *gin.Context) {
 }
 
 func (tctrl *TeamController) ListTeamMembers(c *gin.Context) {
-	teamID := c.Param("teamId")
+	teamID := c.Param("id")
 
-	members, err := tctrl.teamService.ListMembers(teamID)
+	members, err := tctrl.teamService.ListMembers("team_id", teamID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
