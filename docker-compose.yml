@@ -10,7 +10,7 @@ services:
     volumes:
       - st_okr_db_data:/var/lib/postgresql/data
     ports:
-      - '${DB_PORT}:5432'
+      - "${DB_PORT}:5432"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
