@@ -25,7 +25,7 @@ func main() {
 
 	// initialize rabitmq
 	var connected bool
-	for retries := 0; retries <5;retries ++{
+	for retries := 0; retries < 5; retries++ {
 		if err := message.TestRabbitMQConnection(config); err != nil {
 			log.Printf("Attempt %d: %v", retries, err)
 			time.Sleep(10 * time.Second)
@@ -40,7 +40,6 @@ func main() {
 	}
 
 	log.Println("Connected to RabbitMQ")
-
 
 	validator := validator.New()
 	auth.NewAuth()
