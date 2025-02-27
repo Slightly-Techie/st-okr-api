@@ -44,6 +44,7 @@ func (kctrl *KeyResultController) GetKeyResult(c *gin.Context) {
 	kr, err := kctrl.keyResultService.GetData("id", id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

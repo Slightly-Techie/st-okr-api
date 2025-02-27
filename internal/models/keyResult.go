@@ -41,11 +41,11 @@ type KeyResult struct {
 	AssigneeType AssigneeType `gorm:"column:assignee_type;type:varchar(50);not null;default:'team'" json:"assignee_type"`
 	AssigneeID   string       `gorm:"column:assignee_id;not null;index" json:"assignee_id,omitempty"`
 
-	StartDate time.Time `gorm:"column:due_date; not null" json:"start_date"`
+	StartDate time.Time `gorm:"column:start_date; not null" json:"start_date,omitempty"`
 	DueDate   time.Time `gorm:"column:due_date; not null" json:"due_date"`
 	CreatedAt time.Time `gorm:"column:created_at;not null;default:current_timestamp" json:"created_at,omitempty"`
 	UpdatedAt time.Time `gorm:"column:updated_at;not null;default:current_timestamp;autoUpdateTime" json:"updated_at,omitempty"`
-	UpdatedBy []string  `gorm:"column:user_id;not null;index" json:"user_id,omitempty"`
+	// UpdatedBy []string  `gorm:"column:updated_by;type:jsonb;index" json:"user_id,omitempty"`
 }
 
 func (k *KeyResult) UpdateProgress() {
@@ -75,3 +75,30 @@ func (k *KeyResult) UpdateStatus() {
 		k.Status = "behind"
 	}
 }
+
+// func validateMetricValues(kr *models.KeyResult) error {
+// 	switch kr.MetricType {
+
+// 	case models.MetricTypeNumeric, models.MetrictTypeCurrency:
+// 		if kr.CurrentValue < 0 {
+// 			return fmt.Errorf("current value cannot be negative")
+// 		}
+
+// 	case models.MetricTypePercentage:
+// 		if kr.TargetValue < 0 || kr.TargetValue > 100 {
+// 			return fmt.Errorf("percentage target must be between 0 and 100")
+// 		}
+// 		if kr.CurrentValue < 0 || kr.CurrentValue > 100 {
+// 			return fmt.Errorf("percentage current value must be between 0 and 100")
+// 		}
+
+// 	case models.MetricTypeBinary:
+// 		if kr.TargetValue != 0 && kr.TargetValue != 1 {
+// 			return fmt.Errorf("boolean target must be 0 or 1")
+// 		}
+// 		if kr.CurrentValue != 0 && kr.CurrentValue != 1 {
+// 			return fmt.Errorf("boolean current value must be 0 or 1")
+// 		}
+// 	}
+// 	return nil
+// }

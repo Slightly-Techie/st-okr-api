@@ -7,6 +7,7 @@ import (
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
 	"github.com/Slightly-Techie/st-okr-api/internal/models"
 	"github.com/Slightly-Techie/st-okr-api/internal/repositories"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
@@ -16,7 +17,7 @@ type KeyResultService interface {
 	GetData(identifier, id string) (*models.KeyResult, error)
 	UpdateKeyResult(req dto.UpdateKeyResultRequest) (*models.KeyResult, error)
 	DeleteKeyResult(id string) error
-	ListData(identifier, id string) (*models.KeyResult, error)
+	ListData(identifier, id string) ([]models.KeyResult, error)
 }
 
 type keyResultService struct {
@@ -106,7 +107,7 @@ func (k *keyResultService) DeleteKeyResult(id string) error {
 	return nil
 }
 
-func (k *keyResultService) ListData(identifier, objId string) (*models.KeyResult, error) {
+func (k *keyResultService) ListData(identifier, objId string) ([]models.KeyResult, error) {
 	keys, err := k.repo.ListByIdentifier(identifier, objId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list data: %v", err)

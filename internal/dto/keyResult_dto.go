@@ -15,8 +15,8 @@ type CreateKeyResultRequest struct {
 	TargetValue  float64             `json:"target_value" validate:"required"`
 	AssigneeType models.AssigneeType `json:"assignee_type" validate:"required,oneof=individual team"`
 	AssigneeID   string              `json:"assignee_id" validate:"required,uuid"`
-	StartDate    time.Time           `json:"start_date" validate:"required,future"`
-	DueDate      time.Time           `json:"due_date" validate:"required,future"`
+	StartDate    time.Time           `json:"start_date" validate:"required"`
+	DueDate      time.Time           `json:"due_date" validate:"required"`
 }
 
 type UpdateKeyResultRequest struct {
@@ -46,5 +46,5 @@ type KeyResultResponse struct {
 	Status       models.KeyResultProgressStatus `json:"status"`
 	CreatedAt    time.Time                      `json:"created_at"`
 	UpdatedAt    time.Time                      `json:"updated_at"`
-	UpdatedBy    string                         `json:"updated_by"`
+	// UpdatedBy    string                         `json:"updated_by"`
 }

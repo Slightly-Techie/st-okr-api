@@ -18,7 +18,7 @@ type KeyResultRepository interface {
 	GetDB() *gorm.DB
 	Create(keyResult *models.KeyResult) (*models.KeyResult, error)
 	GetByIdentifier(identifier, id string) (*models.KeyResult, error)
-	ListByIdentifier(identifier, id string) (*models.KeyResult, error)
+	ListByIdentifier(identifier, id string) ([]models.KeyResult, error)
 	Update(keyResult *models.KeyResult) (*models.KeyResult, error)
 	Delete(id string) error
 }
@@ -57,8 +57,8 @@ func (k *keyResultRepository) GetByIdentifier(identifier, id string) (*models.Ke
 	return &keyResult, nil
 }
 
-func (k *keyResultRepository) ListByIdentifier(identifier, id string) (*models.KeyResult, error) {
-	var keyResult models.KeyResult
+func (k *keyResultRepository) ListByIdentifier(identifier, id string) ([]models.KeyResult, error) {
+	var keyResult []models.KeyResult
 
 	res := k.db.Where(identifier, id).Find(&keyResult)
 	if res.Error != nil {
@@ -67,7 +67,7 @@ func (k *keyResultRepository) ListByIdentifier(identifier, id string) (*models.K
 		}
 	}
 
-	return &keyResult, nil
+	return keyResult, nil
 }
 
 func (k *keyResultRepository) Update(keyResult *models.KeyResult) (*models.KeyResult, error) {
