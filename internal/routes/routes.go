@@ -62,7 +62,7 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 
 	//objective routes
 	objectiveRoutes := v1.Group("/objectives")
-	objectiveRoutes.Use(middleware.RequireAuth(prov))
+	// objectiveRoutes.Use(middleware.RequireAuth(prov))
 	{
 		objectiveRoutes.POST("/", prov.ObjectivesController.CreateObjective)
 		objectiveRoutes.GET("/:id", prov.ObjectivesController.GetObjectives)
