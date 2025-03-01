@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrKeyReultNotFound     = errors.New("no key result exists with the provided details")
+	ErrKeyResultNotFound    = errors.New("no key result exists with the provided details")
 	ErrKeyResultDBOperation = errors.New("database operation failed")
 )
 
@@ -50,7 +50,7 @@ func (k *keyResultRepository) GetByIdentifier(identifier, id string) (*models.Ke
 	res := k.db.Where(identifier, id).First(&keyResult)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			return nil, ErrKeyReultNotFound
+			return nil, ErrKeyResultNotFound
 		}
 	}
 
@@ -63,7 +63,7 @@ func (k *keyResultRepository) ListByIdentifier(identifier, id string) ([]models.
 	res := k.db.Where(identifier, id).Find(&keyResult)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			return nil, ErrKeyReultNotFound
+			return nil, ErrKeyResultNotFound
 		}
 	}
 
@@ -88,7 +88,7 @@ func (k *keyResultRepository) Delete(id string) error {
 	}
 	if res.RowsAffected == 0 {
 		log.Printf("no Key Result found with id: %s", id)
-		return ErrKeyReultNotFound
+		return ErrKeyResultNotFound
 	}
 
 	return nil

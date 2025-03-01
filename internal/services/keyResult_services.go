@@ -7,6 +7,7 @@ import (
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
 	"github.com/Slightly-Techie/st-okr-api/internal/models"
 	"github.com/Slightly-Techie/st-okr-api/internal/repositories"
+	"github.com/Slightly-Techie/st-okr-api/internal/validation"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -26,6 +27,8 @@ type keyResultService struct {
 }
 
 func NewKeyResultService(repo repositories.KeyResultRepository, validator *validator.Validate) KeyResultService {
+	validation.KeyResultValidators(validator)
+
 	return &keyResultService{
 		repo:      repo,
 		validator: validator,
@@ -42,15 +45,19 @@ func (k *keyResultService) CreateKeyResult(req dto.CreateKeyResultRequest) (*mod
 		ObjectiveID:  req.ObjectiveID,
 		Title:        req.Title,
 		Description:  req.Description,
-		MetricType:   req.MetricType,
+		MetricType:   models.MetricType(req.MetricType),
 		CurrentValue: req.CurrentValue,
 		TargetValue:  req.TargetValue,
-		AssigneeType: req.AssigneeType,
+		AssigneeType: models.AssigneeType(req.AssigneeType),
 		AssigneeID:   req.AssigneeID,
 		StartDate:    req.StartDate,
 		DueDate:      req.DueDate,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
+	}
+
+	if err := validation.ValidateMetricValues(&data); err != nil {
+		return nil, err
 	}
 
 	data.UpdateProgress()
@@ -75,24 +82,32 @@ func (k *keyResultService) GetData(identifier, id string) (*models.KeyResult, er
 
 func (k *keyResultService) UpdateKeyResult(req dto.UpdateKeyResultRequest) (*models.KeyResult, error) {
 	if err := k.validator.Struct(req); err != nil {
+		return nil, fmt.Errorf("validation error: %w", err)
+	}
+
+	existing, err := k.repo.GetByIdentifier("id", req.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find key result: %w", err)
+	}
+
+	existing.Title = req.Title
+	existing.Description = req.Description
+	existing.CurrentValue = req.CurrentValue
+	existing.TargetValue = req.TargetValue
+	existing.MetricType = req.MetricType
+	existing.AssigneeType = req.AssigneeType
+	existing.AssigneeID = req.AssigneeID
+	existing.StartDate = req.StartDate
+	existing.DueDate = req.DueDate
+
+	if err := validation.ValidateMetricValues(existing); err != nil {
 		return nil, err
 	}
 
-	data := models.KeyResult{
-		Title:        req.Title,
-		Description:  req.Description,
-		CurrentValue: req.CurrentValue,
-		// Progress: req.
-		Status:       req.Status,
-		AssigneeType: req.AssigneeType,
-		AssigneeID:   req.AssigneeID,
-		DueDate:      req.DueDate,
-		UpdatedAt:    time.Now(),
-	}
-	data.UpdateProgress()
-	data.UpdateStatus()
+	existing.UpdateProgress()
+	existing.UpdateStatus()
 
-	updatedData, err := k.repo.Update(&data)
+	updatedData, err := k.repo.Update(existing)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update key Result: %v", err)
 	}

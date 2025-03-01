@@ -81,7 +81,7 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 	{
 		keyResultRoutes.GET("/:id", prov.KeyResultController.GetKeyResult)
 		keyResultRoutes.POST("/", prov.KeyResultController.CreateKeyResult)
-		keyResultRoutes.PATCH("/id", prov.KeyResultController.UpdateKeyResult)
+		keyResultRoutes.PATCH("/:id", prov.KeyResultController.UpdateKeyResult)
 		keyResultRoutes.DELETE("/:id", prov.KeyResultController.DeleteKeyResult)
 
 		keyResultRoutes.GET("/objective/:id", prov.KeyResultController.ListObjKeyResults)
