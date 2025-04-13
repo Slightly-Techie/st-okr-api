@@ -55,7 +55,7 @@ func ValidateMetricValues(kr *models.KeyResult) error {
 		}
 
 	case models.MetricTypePercentage:
-		if kr.TargetValue < 0 || kr.TargetValue > 100 {
+		if kr.TargetValue <= 0 || kr.TargetValue > 100 {
 			return fmt.Errorf("percentage target must be between 0 and 100")
 		}
 		if kr.CurrentValue < 0 || kr.CurrentValue > 100 {
@@ -70,5 +70,33 @@ func ValidateMetricValues(kr *models.KeyResult) error {
 			return fmt.Errorf("boolean current value must be 0 or 1")
 		}
 	}
+	return nil
+}
+
+func ValidateAssigneeID(kr *models.KeyResult, isUser, isTeam func(string) bool) error {
+	switch kr.AssigneeID {
+	case string(models.AssigneeTypeIndividual):
+		if !isUser(kr.AssigneeID) {
+			return fmt.Errorf("assignee ID is not valid for individual assignee")
+		}
+	case string(models.AssigneeTypeTeam):
+		if !isTeam(kr.AssigneeID) {
+			return fmt.Errorf("assignee ID is not valid for team assignee")
+		}
+	default:
+		return fmt.Errorf("invalid assignee type")
+	}
+	return nil
+}
+
+func Validate(kr *models.KeyResult, isUser, isTeam func(string) bool) error {
+	if err := ValidateMetricValues(kr); err != nil {
+		return err
+	}
+
+	if err := ValidateAssigneeID(kr, isUser, isTeam); err != nil {
+		return err
+	}
+
 	return nil
 }

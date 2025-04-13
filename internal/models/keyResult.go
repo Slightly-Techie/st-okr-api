@@ -34,7 +34,7 @@ type KeyResult struct {
 	Description  string                  `gorm:"column:description;not null" json:"description,omitempty"`
 	ObjectiveID  string                  `gorm:"column:objective_id;not null;index" json:"objective_id,omitempty"`
 	MetricType   MetricType              `gorm:"column:metric_type;type:varchar(50);not null;default:'percentage'" json:"metric_type,omitempty" validate:"required,metric_type"`
-	TargetValue  float64                 `gorm:"column:target_value;not null" json:"target_value,omitempty"`
+	TargetValue  float64                 `gorm:"column:target_value;not null" json:"target_value"`
 	CurrentValue float64                 `gorm:"column:current_value;" json:"current_value"`
 	Progress     float64                 `gorm:"column:progress;default:0" json:"progress_percentage"`
 	Status       KeyResultProgressStatus `gorm:"column:status;type:varchar(50);default:'not_started'" json:"status,omitempty" validate:"oneof=not_started on_track at_risk behind completed"`
@@ -47,11 +47,29 @@ type KeyResult struct {
 	// UpdatedBy []string  `gorm:"column:updated_by;type:jsonb;index" json:"user_id,omitempty"`
 }
 
+// func (k *KeyResult) UpdateProgress() {
+// 	if k.TargetValue == 0 {
+// 		k.Progress = 0
+// 	}
+// 	k.Progress = (k.CurrentValue / k.TargetValue) * 100
+// }
+
 func (k *KeyResult) UpdateProgress() {
-	if k.TargetValue == 0 {
-		k.Progress = 0
+	switch k.MetricType {
+	case MetricTypeBinary:
+		if k.CurrentValue == 1 {
+			k.TargetValue = 1
+			k.Progress = 100
+		}
+	case MetricTypeNumeric, MetrictTypeCurrency, MetricTypePercentage:
+		if k.TargetValue == 0 {
+			k.Progress = 0
+		}
+		if k.TargetValue > 0 {
+			k.Progress = (k.CurrentValue / k.TargetValue) * 100
+		}
+
 	}
-	k.Progress = (k.CurrentValue / k.TargetValue) * 100
 }
 
 func (k *KeyResult) UpdateStatus() {
