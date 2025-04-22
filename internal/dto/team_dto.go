@@ -1,7 +1,7 @@
 package dto
 
 type CreateTeamRequest struct {
-	Name        string `json:"name" validate:"required,uuid"`
+	Name        string `json:"name" validate:"required"`
 	CompanyID   string `json:"company_id" validate:"required,uuid"`
 	Description string `json:"description"`
 }

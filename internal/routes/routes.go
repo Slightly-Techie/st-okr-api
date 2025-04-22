@@ -75,6 +75,19 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 		teamRoutes.DELETE("/members/:id", prov.TeamController.RemoveMember)
 	}
 
+	// key Result routes
+	keyResultRoutes := v1.Group("/key-results")
+	// keyResultRoutes.Use(middleware.RequireAuth(prov))
+	{
+		keyResultRoutes.GET("/:id", prov.KeyResultController.GetKeyResult)
+		keyResultRoutes.POST("/", prov.KeyResultController.CreateKeyResult)
+		keyResultRoutes.PATCH("/:id", prov.KeyResultController.UpdateKeyResult)
+		keyResultRoutes.DELETE("/:id", prov.KeyResultController.DeleteKeyResult)
+
+		keyResultRoutes.GET("/objective/:id", prov.KeyResultController.ListObjKeyResults)
+		keyResultRoutes.GET("/assignee/:id", prov.KeyResultController.ListAssigneeKeyResults)
+	}
+
 	return router
 }
 

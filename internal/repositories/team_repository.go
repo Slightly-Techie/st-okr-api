@@ -24,7 +24,7 @@ type TeamRepository interface {
 
 	AddTeamMember(member *models.TeamMember) (*models.TeamMember, error)
 	RemoveTeamMember(id string) error
-	GetTeamMembers(id string) ([]models.TeamMember, error)
+	GetTeamMembers(identifier, id string) ([]models.TeamMember, error)
 	IsMember(teamID, userID string) (bool, error)
 }
 
@@ -96,10 +96,10 @@ func (r *teamRepository) AddTeamMember(member *models.TeamMember) (*models.TeamM
 	return member, nil
 }
 
-func (r *teamRepository) GetTeamMembers(id string) ([]models.TeamMember, error) {
+func (r *teamRepository) GetTeamMembers(identifier, id string) ([]models.TeamMember, error) {
 	var members []models.TeamMember
 
-	res := r.db.Where("id = ?", id).Find(&members)
+	res := r.db.Where(identifier, id).Find(&members)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrTeamMemberNotFound

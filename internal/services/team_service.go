@@ -18,7 +18,7 @@ type TeamService interface {
 
 	// AddMember(teamID, userID string) (*models.TeamMember, error)
 	AddMember(t *dto.TeamMemberRequest) (*models.TeamMember, error)
-	ListMembers(teamID string) ([]models.TeamMember, error)
+	ListMembers(identifier, teamID string) ([]models.TeamMember, error)
 	RemoveMember(id string) error
 	// isTeamMember(t dto.TeamMemberRequest) (bool, error)
 }
@@ -116,8 +116,8 @@ func (r *teamService) AddMember(t *dto.TeamMemberRequest) (*models.TeamMember, e
 	return created, nil
 }
 
-func (r *teamService) ListMembers(teamID string) ([]models.TeamMember, error) {
-	teamMembers, err := r.repo.GetTeamMembers(teamID)
+func (r *teamService) ListMembers(identifier, teamID string) ([]models.TeamMember, error) {
+	teamMembers, err := r.repo.GetTeamMembers(identifier, teamID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get team members: %v", err)
 	}
