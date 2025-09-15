@@ -14,6 +14,7 @@ type Provider struct {
 	MembershipController *controllers.MembershipController
 	TeamController       *controllers.TeamController
 	KeyResultController  *controllers.KeyResultController
+	ObjectiveController  *controllers.ObjectiveController
 	DB                   *gorm.DB
 }
 
@@ -24,6 +25,7 @@ func NewProvider(db *gorm.DB, validator *validator.Validate) *Provider {
 	membershipRepo := repositories.NewMembershipRepository(db)
 	teamRepo := repositories.NewTeamRepository(db)
 	keyResultRepo := repositories.NewKeyResultRepository(db)
+	objectiveRepo := repositories.NewObjectiveRepository(db)
 
 	// Initialize services
 	userService := services.NewAuthService(userRepo, validator)
@@ -31,6 +33,7 @@ func NewProvider(db *gorm.DB, validator *validator.Validate) *Provider {
 	membershipService := services.NewMembershipService(membershipRepo, validator)
 	teamService := services.NewTeamService(teamRepo, validator)
 	keyResultService := services.NewKeyResultService(keyResultRepo, validator)
+	objectiveService := services.NewObjectiveService(objectiveRepo, validator)
 
 	// Initialize controllers
 	userController := controllers.NewAuthController(userService)
@@ -38,6 +41,7 @@ func NewProvider(db *gorm.DB, validator *validator.Validate) *Provider {
 	membershipController := controllers.NewMembershipController(membershipService)
 	teamController := controllers.NewTeamController(teamService)
 	keyResultController := controllers.NewKeyResultController(keyResultService)
+	objectiveController := controllers.NewObjectiveController(objectiveService)
 
 	return &Provider{
 		UserController:       userController,
@@ -45,6 +49,7 @@ func NewProvider(db *gorm.DB, validator *validator.Validate) *Provider {
 		MembershipController: membershipController,
 		TeamController:       teamController,
 		KeyResultController:  keyResultController,
+		ObjectiveController:  objectiveController,
 		DB:                   db,
 	}
 }

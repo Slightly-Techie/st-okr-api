@@ -10,7 +10,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-
 func TestRabbitMQConnection(cfg config.Config) error {
 
 	// Load configuration
@@ -30,9 +29,7 @@ func TestRabbitMQConnection(cfg config.Config) error {
 	return nil
 }
 
-
-
-func PublishMessage(eventType string, fields map[string]interface{}) error  {
+func PublishMessage(eventType string, fields map[string]any) error {
 
 	cfg := config.ENV
 
@@ -102,12 +99,10 @@ func PublishMessage(eventType string, fields map[string]interface{}) error  {
 	return nil
 }
 
-
-func ConsumeMessages()  {
+func ConsumeMessages() {
 	cfg := config.ENV
 
 	url := fmt.Sprintf("amqp://%s:%s@%s:%s/", cfg.RabbitUser, cfg.RabbitPassword, cfg.RabbitHost, cfg.RabbitPort)
-
 
 	conn, err := amqp.Dial(url)
 	if err != nil {
@@ -116,14 +111,12 @@ func ConsumeMessages()  {
 
 	defer conn.Close()
 
-
 	ch, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("failed to open a channel: %v", err)
 	}
 
 	defer ch.Close()
-
 
 	queues := []string{"sign_up"} // list of queues to consume messages from
 
@@ -132,11 +125,10 @@ func ConsumeMessages()  {
 	}
 
 	select {}
-	
+
 }
 
-
-func ConsumeFromQueue(ch *amqp.Channel,queueName string)  {
+func ConsumeFromQueue(ch *amqp.Channel, queueName string) {
 	// Declare the queue
 	q, err := ch.QueueDeclare(
 		queueName, // name
@@ -168,19 +160,16 @@ func ConsumeFromQueue(ch *amqp.Channel,queueName string)  {
 		log.Fatalf("Failed to register consumer for queue %s: %v", queueName, err)
 	}
 
-
 	// Process messages in a separate goroutine
 	for msg := range msgs {
 		handleMessage(msg, queueName)
 	}
 }
 
-
-
 func handleMessage(msg amqp.Delivery, queueName string) {
 	log.Printf("Received message")
 
-	var fields map[string]interface{}
+	var fields map[string]any
 	if err := json.Unmarshal(msg.Body, &fields); err != nil {
 		log.Println("Failed to unmarshal message from queue %s: %v", queueName, err)
 		msg.Nack(false, false) // Nack the message and don't requeue
@@ -198,30 +187,28 @@ func handleMessage(msg amqp.Delivery, queueName string) {
 
 	switch eventType {
 	case "sign_up":
-		handleSignUpMailer(fields,msg)
+		handleSignUpMailer(fields, msg)
 	default:
 		log.Println("Unknown event type: %s in queue %s", eventType, queueName)
 		msg.Nack(false, false)
 	}
-	
+
 }
 
-
-func handleSignUpMailer(fields map[string]interface{},msg amqp.Delivery)  {
-	userName,ok := fields["user_name"].(string)
+func handleSignUpMailer(fields map[string]any, msg amqp.Delivery) {
+	userName, ok := fields["user_name"].(string)
 	if !ok {
 		log.Println("User name missing or invalid in message from queue sign_up")
 		msg.Nack(false, false)
 		return
 	}
 
-	userEmail,ok := fields["email"].(string)
+	userEmail, ok := fields["email"].(string)
 	if !ok {
 		log.Println("Email missing or invalid in message from queue sign_up")
 		msg.Nack(false, false)
 		return
 	}
-
 
 	if err := mailer.SendWelcomeEmail(userEmail, userName); err != nil {
 		log.Println("Failed to send welcome email to user %s: %v", userName, err)
@@ -229,9 +216,6 @@ func handleSignUpMailer(fields map[string]interface{},msg amqp.Delivery)  {
 
 	msg.Ack(false)
 }
-
-
-
 
 func getQueueName(eventType string) string {
 	switch eventType {

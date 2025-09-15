@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/Slightly-Techie/st-okr-api/internal/dto"
+	"github.com/Slightly-Techie/st-okr-api/internal/response"
 	"github.com/Slightly-Techie/st-okr-api/internal/services"
 	"github.com/gin-gonic/gin"
 )
@@ -27,12 +27,14 @@ func (ctrl *CompanyController) CreateCompany(c *gin.Context) {
 
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized request"})
+		response.Unauthorized(c, "Unauthorized request")
 		return
 	}
 
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.ValidationError(c, "Invalid request data", map[string]string{
+			"request": err.Error(),
+		})
 		return
 	}
 
@@ -45,57 +47,54 @@ func (ctrl *CompanyController) CreateCompany(c *gin.Context) {
 
 	data, err := ctrl.companyService.CreateCompany(reqBody)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to create company", map[string]string{
+			"service": err.Error(),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Company created successfully",
-		"data":    data,
-	})
+	response.Created(c, data, "Company created successfully")
 }
 
 func (ctrl *CompanyController) GetCompany(c *gin.Context) {
-	// var body dto.CreateCompanyRequest
-
 	id := c.Param("id")
 
 	data, err := ctrl.companyService.GetCompany("id", id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.NotFound(c, "Company not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Company found",
-		"data":    data,
-	})
+	response.OK(c, data, "Company retrieved successfully")
 }
 
 func (ctrl *CompanyController) UpdateCompany(c *gin.Context) {
 	var body dto.CreateCompanyRequest
 
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.ValidationError(c, "Invalid request data", map[string]string{
+			"request": err.Error(),
+		})
 		return
 	}
 
 	data, err := ctrl.companyService.UpdateCompany(body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to update company", map[string]string{
+			"service": err.Error(),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Company created successfully",
-		"data":    data,
-	})
+	response.OK(c, data, "Company updated successfully")
 }
 
 func (ctrl *CompanyController) DeleteCompany(c *gin.Context) {
 	id := c.Param("id")
 	err := ctrl.companyService.DeleteCompany(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(c, "Failed to delete company", map[string]string{
+			"service": err.Error(),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Company deleted successfully"})
+	response.OK(c, nil, "Company deleted successfully")
 }

@@ -16,12 +16,13 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-ID"},
+		ExposeHeaders:    []string{"Content-Length", "X-Request-ID"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
 
+	router.Use(middleware.RequestID())
 	router.Use(ErrorHandlerMiddleware())
 	router.Use(gin.Recovery())
 
@@ -73,6 +74,23 @@ func SetupRouter(prov *provider.Provider) *gin.Engine {
 		teamRoutes.POST("/:id/members", prov.TeamController.AddTeamMember)
 		teamRoutes.GET("/:id/members", prov.TeamController.ListTeamMembers)
 		teamRoutes.DELETE("/members/:id", prov.TeamController.RemoveMember)
+	}
+
+	// Objective routes
+	objectiveRoutes := v1.Group("/objectives")
+	objectiveRoutes.Use(middleware.RequireAuth(prov))
+	{
+		objectiveRoutes.POST("/", prov.ObjectiveController.CreateObjective)
+		objectiveRoutes.GET("/:id", prov.ObjectiveController.GetObjective)
+		objectiveRoutes.GET("/:id/details", prov.ObjectiveController.GetObjectiveWithKeyResults)
+		objectiveRoutes.PUT("/:id", prov.ObjectiveController.UpdateObjective)
+		objectiveRoutes.DELETE("/:id", prov.ObjectiveController.DeleteObjective)
+		objectiveRoutes.PATCH("/:id/progress", prov.ObjectiveController.UpdateObjectiveProgress)
+
+		// List objectives by different criteria
+		objectiveRoutes.GET("/company/:company_id", prov.ObjectiveController.ListCompanyObjectives)
+		objectiveRoutes.GET("/team/:team_id", prov.ObjectiveController.ListTeamObjectives)
+		objectiveRoutes.GET("/owner/:owner_id", prov.ObjectiveController.ListOwnerObjectives)
 	}
 
 	// key Result routes
