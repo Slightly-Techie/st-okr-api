@@ -27,7 +27,7 @@ func RequireAuth(prov *provider.Provider) gin.HandlerFunc {
 
 		tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				fmt.Printf("RequireAuth: Unexpected signing method: %v\n", token.Header["alg"])
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized. Unexpected signing method"})

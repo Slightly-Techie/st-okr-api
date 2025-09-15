@@ -81,7 +81,7 @@ func (k *keyResultRepository) Update(keyResult *models.KeyResult) (*models.KeyRe
 }
 
 func (k *keyResultRepository) Delete(id string) error {
-	res := k.db.Where("id = ?", id).Delete(&models.Team{})
+	res := k.db.Where("id = ?", id).Delete(&models.KeyResult{})
 	if res.Error != nil {
 		log.Printf("error deleting Key Result: %v", res.Error)
 		return fmt.Errorf("%w: %v", ErrKeyResultDBOperation, res.Error)

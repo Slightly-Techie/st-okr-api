@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/Slightly-Techie/st-okr-api/config"
 	"github.com/Slightly-Techie/st-okr-api/db"
+	"github.com/Slightly-Techie/st-okr-api/internal/logger"
 	"github.com/Slightly-Techie/st-okr-api/internal/message"
 	"github.com/Slightly-Techie/st-okr-api/internal/routes"
 	auth "github.com/Slightly-Techie/st-okr-api/pkg"
@@ -16,18 +16,26 @@ import (
 )
 
 func main() {
+	// Initialize logger
+	logger.InitGlobal()
+	defer logger.Custom.Close()
+
+	logger.Info("Starting ST OKR API server")
+
 	database, err := db.InitDB()
 	if err != nil {
-		log.Fatalf("could not connect to db: %v", err)
+		logger.Fatal("Failed to connect to database", "error", err)
 	}
+	logger.Info("Database connection established")
 
 	config := config.ENV
 
 	// initialize rabitmq
+	logger.Info("Initializing RabbitMQ connection")
 	var connected bool
 	for retries := 0; retries < 5; retries++ {
 		if err := message.TestRabbitMQConnection(config); err != nil {
-			log.Printf("Attempt %d: %v", retries, err)
+			logger.Warn("RabbitMQ connection attempt failed", "attempt", retries+1, "error", err)
 			time.Sleep(10 * time.Second)
 		} else {
 			connected = true
@@ -36,10 +44,10 @@ func main() {
 	}
 
 	if !connected {
-		log.Fatalf("could not connect to RabbitMQ")
+		logger.Fatal("Failed to connect to RabbitMQ after 5 attempts")
 	}
 
-	log.Println("Connected to RabbitMQ")
+	logger.Info("RabbitMQ connection established")
 
 	validator := validator.New()
 	auth.NewAuth()
@@ -53,5 +61,6 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "Hello to the SlightlyTechie OKR API!"})
 	})
 
+	logger.Info("Server starting", "port", "8080")
 	router.Run(":8080")
 }

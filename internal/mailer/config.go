@@ -6,7 +6,7 @@ import (
 	"html/template"
 )
 
-func LoadTemplate(templateName string, data interface{}) (string, error) {
+func LoadTemplate(templateName string, data any) (string, error) {
 
 	t, err := template.ParseFiles(fmt.Sprintf("templates/%s.html", templateName))
 
